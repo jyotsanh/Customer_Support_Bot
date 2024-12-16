@@ -4,6 +4,7 @@ from config.settings import get_llm
 # tools
 from tools.math_tool import multiply, add, subtract
 from tools.hotel_info_tool import get_hotel_info
+from tools.book_info_tool import book_hotel
 
 # langchain
 from langchain_community.tools.tavily_search import TavilySearchResults
@@ -18,7 +19,6 @@ load_dotenv()
 
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
-from langchain_google_genai import ChatGoogleGenerativeAI
 
 
 part_2_tools = [
@@ -26,7 +26,8 @@ part_2_tools = [
         add,
         subtract,
         multiply,
-        get_hotel_info
+        get_hotel_info,
+        book_hotel
     ]
 
 def create_primary_assistant_runnable():
@@ -45,7 +46,7 @@ def create_primary_assistant_runnable():
         ]
     ).partial(time=datetime.now)
     # llms available: openai, google, groq
-    llm = get_llm('groq') #-> return llm based on param passed
+    llm = get_llm('google') #-> return llm based on param passed
     # part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(part_1_tools)
     part_2_assistant_runnable = primary_assistant_prompt | llm.bind_tools(part_2_tools)
     print("Returning the assistant runnable with tools")
