@@ -1,5 +1,5 @@
 from langchain_core.runnables import Runnable, RunnableConfig
-from src.core.state import State
+from core.state import State
 
 class Assistant:
     def __init__(self, runnable: Runnable):

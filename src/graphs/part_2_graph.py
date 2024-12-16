@@ -1,18 +1,20 @@
-from langgraph.graph import StateGraph, START
+# langGraphs imports
+from langgraph.graph import StateGraph, START, END
 from langchain_core.runnables import RunnableConfig
+from langgraph.prebuilt import tools_condition
 
-from src.core.state import State
-from src.core.assistant import Assistant
-from src.tools.flight_info import fetch_user_flight_information
-from src.prompts.primary_assistant import create_primary_assistant_runnable
-from src.tools.utility import create_tool_node_with_fallback
+# cores
+from core.state import State
+from core.assistant import Assistant
 
-def tools_condition(state: State):
-    """
-    Determine whether to use tools based on the assistant's response.
-    """
-    last_message = state["messages"][-1]
-    return "tool_calls" in last_message
+#prompts
+from prompts.primary_assistant import create_primary_assistant_runnable, part_2_tools
+
+
+#tools
+from tools.utility import create_tool_node_with_fallback
+# from tools.math_tool import add, subtract, multiply
+
 
 def build_graph():
     """
@@ -21,32 +23,33 @@ def build_graph():
     builder = StateGraph(State)
 
     # Define nodes
-    def user_info(state: State):
-        return {"user_info": fetch_user_flight_information.invoke({})}
+    # def user_info(state: State):
+    #     return {"user_info": fetch_user_flight_information.invoke({})}
 
-    builder.add_node("fetch_user_info", user_info)
-    builder.add_edge(START, "fetch_user_info")
+    # builder.add_node("fetch_user_info", user_info)
+    # builder.add_edge(START, "fetch_user_info")
 
     # Create assistant and tools nodes
     assistant_runnable = create_primary_assistant_runnable()
     builder.add_node("assistant", Assistant(assistant_runnable))
-    builder.add_node("tools", create_tool_node_with_fallback())
+    builder.add_node("tools", create_tool_node_with_fallback(part_2_tools))
 
     # Define edges
-    builder.add_edge("fetch_user_info", "assistant")
+    builder.add_edge(START, "assistant")
     builder.add_conditional_edges(
         "assistant",
         tools_condition,
     )
-    builder.add_edge("tools", "assistant")
+    builder.add_edge("tools", "assistant") # ReAct agent
+    builder.add_edge("assistant", END)
 
     # Compile the graph with memory
     from langgraph.checkpoint.memory import MemorySaver
     memory = MemorySaver()
     
     return builder.compile(
-        checkpointer=memory,
-        interrupt_before=["tools"]
+        checkpointer=memory
+        # interrupt_before=["tools"]
     )
 
 # Create the graph
@@ -67,7 +70,4 @@ def get_response(prompt: str, sender_id: str):
         }
     }
     
-    return part_2_graph.invoke(
-        {"messages": [("user", prompt)]}, 
-        config
-    )
+    return part_2_graph.invoke({"messages": ("user", prompt)}, config)

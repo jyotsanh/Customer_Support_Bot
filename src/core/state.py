@@ -1,13 +1,9 @@
-from typing import TypedDict, List, Tuple
-from langchain_core.messages import BaseMessage
+from typing import Annotated
+
+from typing_extensions import TypedDict
+
+from langgraph.graph.message import AnyMessage, add_messages
+
 
 class State(TypedDict):
-    """
-    Defines the state structure for the LangGraph conversation.
-    
-    Attributes:
-    - messages: Conversation history
-    - user_info: Additional user context
-    """
-    messages: List[Tuple[str, str]]
-    user_info: dict
+    messages: Annotated[list[AnyMessage], add_messages]
