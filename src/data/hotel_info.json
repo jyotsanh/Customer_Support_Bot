@@ -1,0 +1,106 @@
+{
+    "hotel_name": "Bomo",
+    "location": {
+      "address": "Lazimpat, Kathmandu, Nepal",
+      "latitude": 27.7226,
+      "longitude": 85.3223,
+      "proximity_to_airport": "6 km from Tribhuvan International Airport"
+    },
+    "description": "Hotel Bomo is a boutique luxury property nestled in the heart of Kathmandu, blending traditional Nepali architecture with modern comfort. It's an ideal choice for leisure and business travelers seeking a serene yet accessible retreat.",
+    "features": [
+      "Traditional Nepali design with modern amenities",
+      "Rooftop terrace with panoramic city views",
+      "Spa and wellness center offering Ayurvedic treatments",
+      "Free high-speed Wi-Fi",
+      "Conference and meeting rooms",
+      "Multi-cuisine dining options",
+      "Fitness center",
+      "Airport shuttle service"
+    ],
+    "rooms": [
+      {
+        "type": "Deluxe Room",
+        "price_per_night": 120,
+        "description": "Comfortable room with traditional Nepali décor, a queen-sized bed, and modern amenities.",
+        "capacity": 2,
+        "amenities": [
+          "Air conditioning",
+          "Flat-screen TV",
+          "Mini bar",
+          "Complimentary tea and coffee",
+          "Rainfall shower"
+        ]
+      },
+      {
+        "type": "Executive Suite",
+        "price_per_night": 200,
+        "description": "Spacious suite featuring a living room, king-sized bed, and a private balcony with city views.",
+        "capacity": 3,
+        "amenities": [
+          "Private balcony",
+          "Separate living area",
+          "Luxury bathroom with bathtub",
+          "Work desk",
+          "Complimentary bottled water"
+        ]
+      },
+      {
+        "type": "Heritage Suite",
+        "price_per_night": 300,
+        "description": "A luxurious suite adorned with traditional Nepali craftsmanship, featuring a private terrace and exclusive amenities.",
+        "capacity": 2,
+        "amenities": [
+          "Private terrace",
+          "Handcrafted wooden furniture",
+          "Complimentary Nepali tea service",
+          "Exclusive spa discounts",
+          "Butler service"
+        ]
+      }
+    ],
+    "dining": [
+      {
+        "name": "Thakali Kitchen",
+        "cuisine": "Authentic Nepali and Thakali cuisine",
+        "timing": "7:00 AM - 10:00 PM",
+        "highlights": ["Traditional Nepali Thali", "Locally sourced ingredients"]
+      },
+      {
+        "name": "SkyLounge",
+        "cuisine": "Continental and Asian fusion",
+        "timing": "5:00 PM - 11:00 PM",
+        "highlights": ["Rooftop dining", "Live music events"]
+      }
+    ],
+    "activities": [
+      "Guided tours to cultural heritage sites",
+      "Yoga and meditation sessions",
+      "Cooking classes on traditional Nepali cuisine",
+      "Evening cultural performances",
+      "Hiking and trekking coordination services"
+    ],
+    "reviews": [
+      {
+        "author": "Ram Prasad",
+        "rating": 4.7,
+        "comment": "A perfect blend of Nepali tradition and modern luxury. Loved the rooftop views!"
+      },
+      {
+        "author": "Sita Shrestha",
+        "rating": 4.9,
+        "comment": "The Heritage Suite was amazing, and the staff were very hospitable. Highly recommended!"
+      }
+    ],
+    "policies": {
+      "check_in": "2:00 PM",
+      "check_out": "12:00 PM",
+      "cancellation": "Free cancellation up to 24 hours before check-in",
+      "pet_policy": "Pets are not allowed."
+    },
+    "contact_info": {
+      "phone": "+977-1-442-1234",
+      "email": "info@hotelbomo.com",
+      "website": "https://www.hotelbomo.com"
+    }
+  }
+  
