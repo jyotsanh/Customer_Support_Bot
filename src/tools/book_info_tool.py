@@ -1,4 +1,5 @@
 # langchain 
+
 from langchain_core.tools import tool
 
 # libs
@@ -6,6 +7,11 @@ import sqlite3
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
+#config
+from config.settings import send_verification_email, generate_unique_verification_code, validate_email, validate_phone_number
+
+
 
 @tool
 def book_hotel(name: str, check_in_date: str, check_out_date: str, num_rooms: int, num_guests: int) -> str:
@@ -52,5 +58,70 @@ def book_hotel(name: str, check_in_date: str, check_out_date: str, num_rooms: in
         conn.close()
         return f"Hotel {name} has been booked from {check_in_date} to {check_out_date} for {num_rooms} rooms and {num_guests} guests."
     except Exception as e:
-        return f"Error booking hotel: {e}"    
+        return f"Error booking hotel: {e}"
+
+ 
+@tool
+def register_customer(name: str, email: str, phone: str,address: str) -> str:
+    """
+    Register a customer.
+
+    Args:
+        name (str): The name of the customer.
+        email (str): The email address of the customer.
+        phone (str): The phone number of the customer.
+        address (str): The address of the customer.
+
+    Returns:
+        str: A message indicating the customer has been added.
+    """
+    try:
+        # Validate phone number
+        if not validate_phone_number(phone):
+            return "Error: Phone number must be 10 digits long."
+
+        # Validate email
+        if not validate_email(email):
+            return "Error: Invalid email format."
+        
+        print("--------Adding a Customer tool---------")
+        conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
+        c = conn.cursor()
+        
+        print(f"Name: {name}, Email: {email}, Phone: {phone}, Address: {address}")
+        
+        # Generate a unique verification code
+        verification_code = generate_unique_verification_code(conn)
+        print("--------verifi---------")
+        # Insert customer data into the customers table
+        c.execute("""
+            INSERT INTO customers_with_keys (name, email, phone, address, verification_code)
+            VALUES (?, ?, ?, ?, ?)
+        """, (name, email, phone, address, verification_code))
+        
+        print("---executed---")
+        # Commit the transaction
+        conn.commit()
+
+        # Close the connection
+        conn.close()
+        
+        # Send verification code to email (you would implement the email sending logic here)
+        send_verification_email(email, verification_code)
+        print("----sending the mail----")
+        return f"Your account with email {email} has been added. A 6-digit verification code has been sent to your email."
+    except Exception as e:
+        return f"Error adding customer: {e}"
     
+@tool
+def check_customer_status(email: str) -> str:
+    """
+    Check the status of a customer.
+
+    Args:
+        email (str): The email address of the customer.
+
+    Returns:
+        str: A message indicating the customer's status.
+    """
+    pass
