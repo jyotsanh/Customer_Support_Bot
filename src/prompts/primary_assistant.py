@@ -1,6 +1,15 @@
+# config
+from config.settings import get_llm
+
+# tools
 from tools.math_tool import multiply, add, subtract
+from tools.hotel_info_tool import get_hotel_info
+
+# langchain
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.prompts import ChatPromptTemplate
+
+#libs
 from dotenv import load_dotenv
 from datetime import datetime
 import os
@@ -11,21 +20,13 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-1.5-pro",
-    temperature=1,
-    max_tokens=None,
-    timeout=None,
-    max_retries=2,
-    # other params...
-)
-
 
 part_2_tools = [
         TavilySearchResults(max_results=1),
         add,
         subtract,
-        multiply
+        multiply,
+        get_hotel_info
     ]
 
 def create_primary_assistant_runnable():
@@ -33,16 +34,18 @@ def create_primary_assistant_runnable():
         [
             (
                 "system",
-                "You are a helpful Tutor Assistant. "
-                " Use the provided tools to solve the user's math problem to assist the user's queries. "
-                " When searching, be persistent. Expand your query bounds if the first search returns no results. "
-                " If a search comes up empty, expand your search before giving up.",
+                "You are a Chatbot Assistant for Hotel Bomo. "
+                "Always refer to Hotel Bomo in the first person (e.g., 'we,' 'our') when discussing its offerings, services, and features. "
+                "For example, say 'We offer a multi-cuisine dining experience' instead of 'They offer a multi-cuisine dining experience.' "
+                "Use the provided tools to assist the user's queries. "
+                "When searching, be persistent. Expand your query bounds if the first search returns no results. "
+                "If a search comes up empty, expand your search before giving up."
             ),
             ("placeholder", "{messages}"),
         ]
     ).partial(time=datetime.now)
-
-    
+    # llms available: openai, google, groq
+    llm = get_llm('groq') #-> return llm based on param passed
     # part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(part_1_tools)
     part_2_assistant_runnable = primary_assistant_prompt | llm.bind_tools(part_2_tools)
     print("Returning the assistant runnable with tools")
