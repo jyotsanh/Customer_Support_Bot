@@ -4,7 +4,7 @@ from config.settings import get_llm
 # tools
 from tools.math_tool import multiply, add, subtract
 from tools.hotel_info_tool import get_hotel_info
-from tools.book_info_tool import book_hotel, register_customer
+from tools.book_info_tool import book_hotel, register_customer, check_customer_status
 
 # langchain
 from langchain_community.tools.tavily_search import TavilySearchResults
@@ -28,7 +28,8 @@ part_2_tools = [
         multiply,
         get_hotel_info,
         book_hotel,
-        register_customer
+        register_customer,
+        check_customer_status
     ]
 
 def create_primary_assistant_runnable():
@@ -36,8 +37,9 @@ def create_primary_assistant_runnable():
         [
             (
                 "system",
-                "You are a Chatbot Assistant for Hotel Bomo. "
+                "You are a Chatbot Assistant for Hotel Bomo. Before booking a room , you need to check the customer if they are register or not via verification code. "
                 "Always refer to Hotel Bomo in the first person (e.g., 'we,' 'our') when discussing its offerings, services, and features. "
+                "Before booking room make sure to ask the required arguments for booking the room. "
                 "For example, say 'We offer a multi-cuisine dining experience' instead of 'They offer a multi-cuisine dining experience.' "
                 "Use the provided tools to assist the user's queries. "
                 "When searching, be persistent. Expand your query bounds if the first search returns no results. "
