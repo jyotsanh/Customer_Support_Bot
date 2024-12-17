@@ -224,3 +224,60 @@ def cancel_booking(verification_code: str) -> str:
     except Exception as e:
         return f"Error cancelling customer: {e}"
     
+    
+@tool
+def update_hotel_info(
+        check_in_date: str=None, 
+        check_out_date: str=None, 
+        num_rooms: int=None, 
+        num_guests: int=None,
+        verification_code:str=None
+        ) -> str:
+    """
+    Updates the Booking status for a hotel in the database.
+
+    Args:
+        check_in_date (str, optional): The new check-in date.
+        check_out_date (str, optional): The new check-out date.
+        num_rooms (int, optional): The new number of rooms.
+        num_guests (int, optional): The new number of guests.
+        verification_code (str, optional): The verification code for the booking.
+
+    Returns:
+        str: A message indicating the update status.
+    """
+    if not verification_code:
+        return "Verification code is required to update booking."
+    print("--------Using update_hotel_info tool---------")
+    try:
+        # Use context manager for database connection
+        with sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db") as conn:
+            conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
+            c = conn.cursor()
+
+            # Check if the verification code exists
+            c.execute("SELECT check_in_date, check_out_date, num_rooms, num_guests FROM booking_with_keys WHERE verification_code = ?", (verification_code,))
+            booking_info = c.fetchone()
+            if not booking_info:
+                print("Booking not found.")
+                return "You have not booked a room in our hotel yet."   
+            
+            print(f"Old Booking info: {booking_info}")
+
+            # Use existing values if the new ones are empty
+            updated_check_in_date = check_in_date if check_in_date else booking_info[0]
+            updated_check_out_date = check_out_date if check_out_date else booking_info[1]
+            updated_num_rooms = num_rooms if num_rooms else booking_info[2]
+            updated_num_guests = num_guests if num_guests else booking_info[3]
+            
+            # Update the booking info
+            c.execute("UPDATE booking_with_keys SET check_in_date = ?, check_out_date = ?, num_rooms = ?, num_guests = ? WHERE verification_code = ?",
+                      (updated_check_in_date, updated_check_out_date, updated_num_rooms, updated_num_guests, verification_code))
+            
+                     
+            conn.commit()
+            conn.close()
+    except Exception as e:
+        return f"Error updating hotel info: {e}"
+        
+    return f"Hotel info updated successfully."

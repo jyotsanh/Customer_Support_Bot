@@ -16,8 +16,6 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-api_key = os.getenv('OPENAI_API_KEY')
-
 def get_llm(model:str='google'):
     if model=="google":
         llm = ChatGoogleGenerativeAI(
@@ -31,7 +29,12 @@ def get_llm(model:str='google'):
             )
         return llm
     elif model=="openai":
-        llm=ChatOpenAI(api_key=api_key,model="gpt-4o-mini", stream_usage=True)
+        llm=ChatOpenAI(
+                api_key=os.getenv('OPENAI_API_KEY'),
+                model="gpt-4o-mini", 
+                temperature=0,
+                stream_usage=True
+            )
         
         return llm
     elif model=="groq":

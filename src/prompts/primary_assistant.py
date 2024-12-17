@@ -4,7 +4,7 @@ from config.settings import get_llm
 # tools
 from tools.math_tool import multiply, add, subtract
 from tools.hotel_info_tool import get_hotel_info
-from tools.book_info_tool import book_hotel, register_customer, check_customer_status, cancel_booking
+from tools.book_info_tool import book_hotel, register_customer, check_customer_status, cancel_booking, update_hotel_info
 
 # langchain
 from langchain_community.tools.tavily_search import TavilySearchResults
@@ -30,7 +30,8 @@ part_2_tools = [
         book_hotel,
         register_customer,
         check_customer_status,
-        cancel_booking
+        cancel_booking,
+        update_hotel_info
     ]
 
 def create_primary_assistant_runnable():
