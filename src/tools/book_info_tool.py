@@ -34,17 +34,12 @@ def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_gues
         conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
         c = conn.cursor()
 
-        # # Create test_booking table if it doesn't exist
-        # c.execute("""
-        #     CREATE TABLE IF NOT EXISTS test_booking (
-        #         id INTEGER PRIMARY KEY,
-        #         hotel_name TEXT,
-        #         check_in_date TEXT,
-        #         check_out_date TEXT,
-        #         num_rooms INTEGER,
-        #         num_guests INTEGER
-        #     )
-        # """)
+        # check if the provided verification code is valid
+        c.execute("SELECT COUNT(*) FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
+        customer_info = c.fetchone()
+        print(customer_info)
+        if customer_info[0] == 0:
+            return "pls double check the verification code and try again."
 
         # Insert booking data into the test_booking table
         c.execute("""

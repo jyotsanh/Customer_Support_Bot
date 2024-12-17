@@ -15,7 +15,7 @@ vector_store = Chroma(
                     )
 @tool
 def get_hotel_info(query: str) -> str:
-    """get_hotel_info
+    """
     Retrieve information about a hotel based on a user's query.
     
     Args:
