@@ -21,8 +21,8 @@ api_key = os.getenv('OPENAI_API_KEY')
 def get_llm(model:str='google'):
     if model=="google":
         llm = ChatGoogleGenerativeAI(
-                model="gemini-1.5-pro",
-                api_key=os.getenv("GOOGLE_API_KEY2"),
+                model="gemini-1.5-flash",
+                api_key=os.getenv("GOOGLE_API_KEY"),
                 temperature=1,
                 max_tokens=None,
                 timeout=None,

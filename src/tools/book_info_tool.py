@@ -126,10 +126,11 @@ def check_customer_status(verification_code: str) -> str:
         str: A message returning the status of the customer booking the hotel check_in_date, check_out_date
     """
     print("--------Using check_customer_status tool---------")
-    conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
+    
     
         
     try: 
+        conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
         c = conn.cursor()
         
         c.execute("SELECT * FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
@@ -143,10 +144,15 @@ def check_customer_status(verification_code: str) -> str:
         # customer info
         customer_id, name, email, phone, address, verification_code = customer_info
         
-        # booking info
-        id, hotel_name, check_in_date, check_out_date, num_rooms, num_guests, verification_code = booking_info
+        # Commit the changes
+        conn.commit()
+
+        # Close the connection
+        conn.close()
         
         if booking_info and customer_info:
+            # booking info
+            id, hotel_name, check_in_date, check_out_date, num_rooms, num_guests, verification_code = booking_info
             print("-----------------chat-bot has user & booking info-----------------")
             print()
             return (
@@ -171,13 +177,13 @@ def check_customer_status(verification_code: str) -> str:
                 "You can proceed with booking a room."
                 )
         else:
-            return "It seems you have not registered yet. Please register again."
+            return f"Okay, so {name}.It seems you have not Booked a room yet. Please Book a room "
     except Exception as e:
         return f"Pls register again"
     
 
 @tool
-def cancel_booking(verification_code: int) -> str:
+def cancel_booking(verification_code: str) -> str:
     """
     Using the verification code send via mail,The Cancels the booking of a hotel room.
     
@@ -185,7 +191,36 @@ def cancel_booking(verification_code: int) -> str:
         verification_code (int): The verification code sent to the customer.
     
     Returns:
-        str: A message indicating the booking has been canceled.
+        str: A message indicating the booking cancellation status.
     """
+    print("--------Using Cancel_booking tool---------")
     
-    pass
+    try:
+        # Use context manager for database connection
+        with sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db") as conn:
+            cursor = conn.cursor()
+
+            # First, check if the booking exists
+            cursor.execute("SELECT * FROM booking_with_keys WHERE verification_code = ?", (verification_code,))
+            booking = cursor.fetchone()
+            print("--------booking---------")
+            if not booking:
+                print("Booking not found.")
+                return "You have not booked a room in our hotel yet."
+            # booking info
+            id, hotel_name, check_in_date, check_out_date, num_rooms, num_guests, verification_code = booking
+        
+            # Delete the booking
+            cursor.execute("DELETE FROM booking_with_keys WHERE verification_code = ?", (verification_code,))
+            print("--------booking deleted---------")
+            # # Optionally, you might want to delete associated customer info or mark as canceled
+            # cursor.execute("DELETE FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
+
+            # Commit the changes
+            conn.commit()
+
+            return f"Booking successfully canceled."
+        
+    except Exception as e:
+        return f"Error cancelling customer: {e}"
+    
