@@ -1,5 +1,7 @@
 # langchain 
 
+import random
+import string
 from langchain_core.tools import tool
 
 # libs
@@ -9,9 +11,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #config
-from config.settings import send_verification_email, generate_unique_verification_code, validate_email, validate_phone_number
+from config.settings import send_verification_email, generate_unique_verification_code, validate_email, validate_phone_number, send_email
 
-
+def generate_room_number():
+    # Generate a random room number
+    room_number = ''.join(random.choices(string.digits, k=4))
+    return room_number
 
 @tool
 def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_guests: int, verification_code: int) -> str:
@@ -47,11 +52,25 @@ def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_gues
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (name, check_in_date, check_out_date, num_rooms, num_guests, verification_code))
 
+        # Get customer info from the customers table
+        c.execute("SELECT name, email FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
+        customer_info = c.fetchone()
+        name, email = customer_info
         # Commit the transaction
         conn.commit()
 
         # Close the connection
         conn.close()
+        room_number = generate_room_number()
+        send_email(
+            smtp_host=os.getenv("SMTP_HOST"),
+            smtp_port=os.getenv("SMTP_PORT"),
+            sender_email=os.getenv("EMAIL"),
+            sender_password=os.getenv("EMAIL_PASSWORD"),
+            recipient_email=email,
+            subject="You Room has been Booked",
+            body=f"Hi {name}, \n Your Room Number is: {room_number} \n Have a nice trip!"
+        )
         return f"Hotel {name} has been booked from {check_in_date} to {check_out_date} for {num_rooms} rooms and {num_guests} guests."
     except Exception as e:
         return f"Error booking hotel: {e}"

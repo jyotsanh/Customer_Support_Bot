@@ -8,15 +8,11 @@ from config.settings import get_embeddings
 # from models.db import VectorStore
 embedding_function = get_embeddings(name = "google")
 hotel_info = "hotel_info"
-vector_store = Chroma(
-                    persist_directory=f"./Chroma/{hotel_info}_Chroma", 
-                    embedding_function=embedding_function,
-                    collection_name="hotel_info"
-                    )
+
 @tool
-def get_hotel_info(query: str) -> str:
+def get_info_about_hotel_bomo(query: str) -> str:
     """
-    Retrieve information about a hotel based on a user's query.
+    Retrieves any information about a hotel Bomo.
     
     Args:
         query (str): The user's query.
@@ -24,8 +20,18 @@ def get_hotel_info(query: str) -> str:
     Returns:    
         str: The information about the hotel.
     """
-    docs = vector_store.similarity_search(query, k=4)
-    print("------docs-------")
-    print(docs)
-    print("------end---------")
-    return docs
+    try:
+        print("---------Using get_hotel_info tool---------")
+        vector_store = Chroma(
+                        persist_directory=f"./Chroma/{hotel_info}_Chroma", 
+                        embedding_function=embedding_function,
+                        collection_name="hotel_info"
+                        )
+        docs = vector_store.similarity_search(query, k=4)
+        print("------docs-------")
+        print(docs)
+        print("------end---------")
+        return docs
+    except Exception as e:
+        print(f"Error in get_hotel_info tool: {e}")
+        return "error fetching the similar docs for the hotel"
