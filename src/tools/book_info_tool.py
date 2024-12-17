@@ -117,7 +117,7 @@ def register_customer(name: str, email: str, phone: str,address: str) -> str:
 @tool
 def check_customer_status(verification_code: str) -> str:
     """
-    retrieve the customer status from the verification code, to book a room in a hotel.
+    retrieve the customer status from the verification code.
 
     Args:
         verification_code (str): code sent to the customer
@@ -125,29 +125,53 @@ def check_customer_status(verification_code: str) -> str:
     Returns:
         str: A message returning the status of the customer booking the hotel check_in_date, check_out_date
     """
+    print("--------Using check_customer_status tool---------")
     conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
     
         
     try: 
         c = conn.cursor()
+        
         c.execute("SELECT * FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
         # Fetch the result
         customer_info = c.fetchone()
+        print(customer_info)
+        # fetch booking info
+        c.execute("SELECT * FROM booking_with_keys WHERE verification_code = ?", (verification_code,))
+        booking_info = c.fetchone()
+        print(booking_info)
+        # customer info
+        customer_id, name, email, phone, address, verification_code = customer_info
         
-        if customer_info:
+        # booking info
+        id, hotel_name, check_in_date, check_out_date, num_rooms, num_guests, verification_code = booking_info
+        
+        if booking_info and customer_info:
+            print("-----------------chat-bot has user & booking info-----------------")
+            print()
+            return (
+                 f"Welcome back {name}\n You have successfully registered for the following booking:\n"
+                    f"Check-in: {check_in_date}\n"
+                    f"Check-out: {check_out_date}\n"
+                    f"Rooms: {num_rooms}\n"
+                    f"Guests: {num_guests}"
+            )
+        elif customer_info:
             print("-----------------chat-bot has user info-----------------")
             print(customer_info)
-            customer_id, name, email, phone, address, verification_code = customer_info
+            
             print(customer_id, name, email, phone, address)
-            return (f"Customer Verified:\n"
-                    f"ID: {customer_id}\n"
-                    f"Name: {name}\n"
-                    f"Email: {email}\n"
-                    f"Phone: {phone}\n"
-                    f"Address: {address}\n"
-                    "You can proceed with booking a room.")
+            return (
+                f"Customer Verified:\n"
+                f"ID: {customer_id}\n"
+                f"Name: {name}\n"
+                f"Email: {email}\n"
+                f"Phone: {phone}\n"
+                f"Address: {address}\n"
+                "You can proceed with booking a room."
+                )
         else:
-            return "Verification failed: Invalid code. Please register again."
+            return "It seems you have not registered yet. Please register again."
     except Exception as e:
         return f"Pls register again"
     
