@@ -1,5 +1,7 @@
 # langchain 
 
+import random
+import string
 from langchain_core.tools import tool
 
 # libs
@@ -9,9 +11,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #config
-from config.settings import send_verification_email, generate_unique_verification_code, validate_email, validate_phone_number
+from config.settings import send_verification_email, generate_unique_verification_code, validate_email, validate_phone_number, send_email
 
-
+def generate_room_number():
+    # Generate a random room number
+    room_number = ''.join(random.choices(string.digits, k=4))
+    return room_number
 
 @tool
 def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_guests: int, verification_code: int) -> str:
@@ -34,17 +39,12 @@ def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_gues
         conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
         c = conn.cursor()
 
-        # # Create test_booking table if it doesn't exist
-        # c.execute("""
-        #     CREATE TABLE IF NOT EXISTS test_booking (
-        #         id INTEGER PRIMARY KEY,
-        #         hotel_name TEXT,
-        #         check_in_date TEXT,
-        #         check_out_date TEXT,
-        #         num_rooms INTEGER,
-        #         num_guests INTEGER
-        #     )
-        # """)
+        # check if the provided verification code is valid
+        c.execute("SELECT COUNT(*) FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
+        customer_info = c.fetchone()
+        print(customer_info)
+        if customer_info[0] == 0:
+            return "pls double check the verification code and try again."
 
         # Insert booking data into the test_booking table
         c.execute("""
@@ -52,11 +52,25 @@ def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_gues
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (name, check_in_date, check_out_date, num_rooms, num_guests, verification_code))
 
+        # Get customer info from the customers table
+        c.execute("SELECT name, email FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
+        customer_info = c.fetchone()
+        name, email = customer_info
         # Commit the transaction
         conn.commit()
 
         # Close the connection
         conn.close()
+        room_number = generate_room_number()
+        send_email(
+            smtp_host=os.getenv("SMTP_HOST"),
+            smtp_port=os.getenv("SMTP_PORT"),
+            sender_email=os.getenv("EMAIL"),
+            sender_password=os.getenv("EMAIL_PASSWORD"),
+            recipient_email=email,
+            subject="You Room has been Booked",
+            body=f"Hi {name}, \n Your Room Number is: {room_number} \n Have a nice trip!"
+        )
         return f"Hotel {name} has been booked from {check_in_date} to {check_out_date} for {num_rooms} rooms and {num_guests} guests."
     except Exception as e:
         return f"Error booking hotel: {e}"

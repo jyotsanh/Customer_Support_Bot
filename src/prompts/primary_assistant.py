@@ -3,7 +3,7 @@ from config.settings import get_llm
 
 # tools
 from tools.math_tool import multiply, add, subtract
-from tools.hotel_info_tool import get_hotel_info
+from tools.hotel_info_tool import get_info_about_hotel_bomo
 from tools.book_info_tool import book_hotel, register_customer, check_customer_status, cancel_booking, update_hotel_info
 
 # langchain
@@ -23,10 +23,7 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 part_2_tools = [
         TavilySearchResults(max_results=1),
-        add,
-        subtract,
-        multiply,
-        get_hotel_info,
+        get_info_about_hotel_bomo,
         book_hotel,
         register_customer,
         check_customer_status,
@@ -39,7 +36,8 @@ def create_primary_assistant_runnable():
         [
             (
                 "system",
-                "You are a Chatbot Assistant for Hotel Bomo. Before booking a room , you need to check the customer if they are register or not via verification code. "
+                "You are a Chatbot Assistant for Hotel Bomo. Answer any query related to Hotel Bomo using `get_info_about_hotel` tools. "
+                " Before booking a room , you need to check the customer if they are register or not via verification code. "
                 "Always refer to Hotel Bomo in the first person (e.g., 'we,' 'our') when discussing its offerings, services, and features. "
                 "Before booking room make sure to ask the required arguments for booking the room. "
                 "For example, say 'We offer a multi-cuisine dining experience' instead of 'They offer a multi-cuisine dining experience.' "
@@ -50,9 +48,22 @@ def create_primary_assistant_runnable():
             ("placeholder", "{messages}"),
         ]
     ).partial(time=datetime.now)
+    
+    test_primary_assistant_prompt = ChatPromptTemplate.from_messages(
+        [
+            (
+                "system",
+                "Answer any query related to Hotel Bomo using `get_info_about_hotel` tools."
+                "You are a Customer Support Assistant for Hotel Bomo."
+                "Before booking a room , you need to check if the customer has their verification code or not, if not then ask them to register"
+            ),
+            ("placeholder", "{messages}"),
+        ]
+    ).partial(time=datetime.now)
+    
     # llms available: openai, google, groq
     llm = get_llm('google') #-> return llm based on param passed
     # part_1_assistant_runnable = primary_assistant_prompt | llm.bind_tools(part_1_tools)
-    part_2_assistant_runnable = primary_assistant_prompt | llm.bind_tools(part_2_tools)
+    part_2_assistant_runnable = test_primary_assistant_prompt | llm.bind_tools(part_2_tools)
     print("Returning the assistant runnable with tools")
     return part_2_assistant_runnable

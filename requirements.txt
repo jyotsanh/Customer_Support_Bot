@@ -12,3 +12,4 @@ langchain-google-genai
 langchain-chroma
 langchain-groq
 chromadb
+streamlit
