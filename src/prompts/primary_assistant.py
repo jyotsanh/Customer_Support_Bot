@@ -4,7 +4,7 @@ from config.settings import get_llm
 # tools
 from tools.math_tool import multiply, add, subtract
 from tools.hotel_info_tool import get_info_about_hotel_bomo
-from tools.book_info_tool import book_hotel, register_customer, check_customer_status, cancel_booking, update_hotel_info
+from tools.book_info_tool import book_hotel, cancel_booking, update_hotel_info
 
 # langchain
 from langchain_community.tools.tavily_search import TavilySearchResults
@@ -23,12 +23,10 @@ TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 
 part_2_tools = [
         TavilySearchResults(max_results=1),
-        get_info_about_hotel_bomo,
-        book_hotel,
-        register_customer,
-        check_customer_status,
-        cancel_booking,
-        update_hotel_info
+        # get_info_about_hotel_bomo,
+        # book_hotel,
+        # cancel_booking,
+        # update_hotel_info
     ]
 
 def create_primary_assistant_runnable():
@@ -53,9 +51,10 @@ def create_primary_assistant_runnable():
         [
             (
                 "system",
-                "Answer any query related to Hotel Bomo using `get_info_about_hotel` tools."
+                "Answer any query related to Hotel Bomo [`location`,`description`,`rooms`,`dining`,`activities`,`contact_info`] using `get_info_about_hotel` tools."
+                "Before running the tools, repeat back the required arguments before invoking the tools. "
                 "You are a Customer Support Assistant for Hotel Bomo."
-                "Before booking a room , you need to check if the customer has their verification code or not, if not then ask them to register"
+                "Always refer to Hotel Bomo in the first person (e.g., 'we,' 'our') when discussing its offerings, services, and features. "
             ),
             ("placeholder", "{messages}"),
         ]

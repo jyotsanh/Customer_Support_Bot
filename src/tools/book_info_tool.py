@@ -1,9 +1,11 @@
 # langchain 
 
+import datetime
 import random
 import string
+import uuid
 from langchain_core.tools import tool
-
+from redis_mem.redis import *
 # libs
 import sqlite3
 import os
@@ -19,7 +21,7 @@ def generate_room_number():
     return room_number
 
 @tool
-def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_guests: int, verification_code: int) -> str:
+def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_guests: int) -> str:
     """
     Book a room in a hotel.
 
@@ -28,50 +30,38 @@ def book_hotel(check_in_date: str, check_out_date: str, num_rooms: int, num_gues
         check_out_date (str): The check-out date.
         num_rooms (int): The number of rooms.
         num_guests (int): The number of guests.
-        verification_code (int): The verification code which was sent to the customer while registering.
-
     Returns:
         str: A message indicating the hotel has been booked.
     """
     try:
-        name="Hotel Bomo"
-        print("--------Using Booking tool---------")
-        conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
-        c = conn.cursor()
+        # Validate input data
+        try:
+            check_in = datetime.strptime(check_in_date, "%Y-%m-%d")
+            check_out = datetime.strptime(check_out_date, "%Y-%m-%d")
+            if check_out <= check_in:
+                raise ValueError("Check-out date must be after check-in date")
+        except ValueError as e:
+            return f"Invalid date format or date logic: {e}"
 
-        # check if the provided verification code is valid
-        c.execute("SELECT COUNT(*) FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
-        customer_info = c.fetchone()
-        print(customer_info)
-        if customer_info[0] == 0:
-            return "pls double check the verification code and try again."
+        if num_rooms <= 0 or num_guests <= 0:
+            return "Number of rooms and guests must be positive"
 
-        # Insert booking data into the test_booking table
-        c.execute("""
-                INSERT INTO booking_with_keys (hotel_name, check_in_date, check_out_date, num_rooms, num_guests, verification_code)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (name, check_in_date, check_out_date, num_rooms, num_guests, verification_code))
+        # Create booking data
+        booking_id = str(uuid.uuid4())
+        booking_data = {
+            "booking_id": booking_id,
+            "check_in_date": check_in_date,
+            "check_out_date": check_out_date,
+            "num_rooms": num_rooms,
+            "num_guests": num_guests,
+            "status": "confirmed",
+        }
 
-        # Get customer info from the customers table
-        c.execute("SELECT name, email FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
-        customer_info = c.fetchone()
-        name, email = customer_info
-        # Commit the transaction
-        conn.commit()
+        # Store booking in Redis
+        setData(f"booking:{booking_id}", booking_data)
 
-        # Close the connection
-        conn.close()
-        room_number = generate_room_number()
-        send_email(
-            smtp_host=os.getenv("SMTP_HOST"),
-            smtp_port=os.getenv("SMTP_PORT"),
-            sender_email=os.getenv("EMAIL"),
-            sender_password=os.getenv("EMAIL_PASSWORD"),
-            recipient_email=email,
-            subject="You Room has been Booked",
-            body=f"Hi {name}, \n Your Room Number is: {room_number} \n Have a nice trip!"
-        )
-        return f"Hotel {name} has been booked from {check_in_date} to {check_out_date} for {num_rooms} rooms and {num_guests} guests."
+        return f"""Booking confirmed!"""
+
     except Exception as e:
         return f"Error booking hotel: {e}"
 
@@ -127,75 +117,7 @@ def register_customer(name: str, email: str, phone: str,address: str) -> str:
         return f"Your account with email {email} has been added. A 6-digit verification code has been sent to your email."
     except Exception as e:
         return f"Error adding customer: {e}"
-    
-@tool
-def check_customer_status(verification_code: str) -> str:
-    """
-    retrieve the customer status from the verification code.
-
-    Args:
-        verification_code (str): code sent to the customer
-
-    Returns:
-        str: A message returning the status of the customer booking the hotel check_in_date, check_out_date
-    """
-    print("--------Using check_customer_status tool---------")
-    
-    
-        
-    try: 
-        conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
-        c = conn.cursor()
-        
-        c.execute("SELECT * FROM customers_with_keys WHERE verification_code = ?", (verification_code,))
-        # Fetch the result
-        customer_info = c.fetchone()
-        print(customer_info)
-        # fetch booking info
-        c.execute("SELECT * FROM booking_with_keys WHERE verification_code = ?", (verification_code,))
-        booking_info = c.fetchone()
-        print(booking_info)
-        # customer info
-        customer_id, name, email, phone, address, verification_code = customer_info
-        
-        # Commit the changes
-        conn.commit()
-
-        # Close the connection
-        conn.close()
-        
-        if booking_info and customer_info:
-            # booking info
-            id, hotel_name, check_in_date, check_out_date, num_rooms, num_guests, verification_code = booking_info
-            print("-----------------chat-bot has user & booking info-----------------")
-            print()
-            return (
-                 f"Welcome back {name}\n You have successfully registered for the following booking:\n"
-                    f"Check-in: {check_in_date}\n"
-                    f"Check-out: {check_out_date}\n"
-                    f"Rooms: {num_rooms}\n"
-                    f"Guests: {num_guests}"
-            )
-        elif customer_info:
-            print("-----------------chat-bot has user info-----------------")
-            print(customer_info)
-            
-            print(customer_id, name, email, phone, address)
-            return (
-                f"Customer Verified:\n"
-                f"ID: {customer_id}\n"
-                f"Name: {name}\n"
-                f"Email: {email}\n"
-                f"Phone: {phone}\n"
-                f"Address: {address}\n"
-                "You can proceed with booking a room."
-                )
-        else:
-            return f"Okay, so {name}.It seems you have not Booked a room yet. Please Book a room "
-    except Exception as e:
-        return f"Pls register again"
-    
-
+       
 @tool
 def cancel_booking(verification_code: str) -> str:
     """
@@ -241,11 +163,7 @@ def cancel_booking(verification_code: str) -> str:
     
 @tool
 def update_hotel_info(
-        check_in_date: str=None, 
-        check_out_date: str=None, 
-        num_rooms: int=None, 
-        num_guests: int=None,
-        verification_code:str=None
+        request_id
         ) -> str:
     """
     Updates the Booking status for a hotel in the database.
@@ -260,37 +178,8 @@ def update_hotel_info(
     Returns:
         str: A message indicating the update status.
     """
-    if not verification_code:
-        return "Verification code is required to update booking."
-    print("--------Using update_hotel_info tool---------")
     try:
-        # Use context manager for database connection
-        with sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db") as conn:
-            conn = sqlite3.connect(f"{os.getenv('DATABASE_PATH')}.db")
-            c = conn.cursor()
-
-            # Check if the verification code exists
-            c.execute("SELECT check_in_date, check_out_date, num_rooms, num_guests FROM booking_with_keys WHERE verification_code = ?", (verification_code,))
-            booking_info = c.fetchone()
-            if not booking_info:
-                print("Booking not found.")
-                return "You have not booked a room in our hotel yet."   
-            
-            print(f"Old Booking info: {booking_info}")
-
-            # Use existing values if the new ones are empty
-            updated_check_in_date = check_in_date if check_in_date else booking_info[0]
-            updated_check_out_date = check_out_date if check_out_date else booking_info[1]
-            updated_num_rooms = num_rooms if num_rooms else booking_info[2]
-            updated_num_guests = num_guests if num_guests else booking_info[3]
-            
-            # Update the booking info
-            c.execute("UPDATE booking_with_keys SET check_in_date = ?, check_out_date = ?, num_rooms = ?, num_guests = ? WHERE verification_code = ?",
-                      (updated_check_in_date, updated_check_out_date, updated_num_rooms, updated_num_guests, verification_code))
-            
-                     
-            conn.commit()
-            conn.close()
+        pass
     except Exception as e:
         return f"Error updating hotel info: {e}"
         

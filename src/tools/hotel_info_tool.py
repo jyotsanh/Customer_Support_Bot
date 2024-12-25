@@ -7,7 +7,7 @@ from config.settings import get_embeddings
 
 # from models.db import VectorStore
 embedding_function = get_embeddings(name = "google")
-hotel_info = "hotel_info"
+hotel_info = "new_hotel_info"
 
 @tool
 def get_info_about_hotel_bomo(query: str) -> str:

@@ -22,7 +22,13 @@ def chat_endpoint(query: str, senderId: str):
     try:
         print("--------Getting response from Runnable LLM node-------")
         response = get_response(query,senderId)
+        print()
         print("--------Response from Runnable LLM node received-------")
+        print()
+        print("-----------------API Booking Response-----------------")
+        print("Response: \n",response['messages'][-1].content)
+        print("-----------------API Booking Response------------------")
+        print()
         # return ChatResponse(message=response['messages'][-1].content)
         respond = {"msg":response['messages'][-1].content}
         

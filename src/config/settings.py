@@ -75,10 +75,10 @@ def send_email(smtp_host, smtp_port, sender_email, sender_password, recipient_em
 def get_embeddings(name:str = None):
    
     if name == "google":
-        embeddings=GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+        embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
         return embeddings 
     else:
-        return "Only Open ai embeddings works for now."   
+        return "Only Google embeddings works for now."   
     
 # Function to validate phone number (10 digits)
 def validate_phone_number(phone: str) -> bool:
