@@ -3,6 +3,8 @@ from langgraph.graph import StateGraph, START, END
 from langchain_core.runnables import RunnableConfig
 from langgraph.prebuilt import tools_condition
 
+# redis
+from redis_mem.redis import *
 # cores
 from core.state import State
 from core.assistant import Assistant
@@ -10,18 +12,29 @@ from core.assistant import Assistant
 #prompts
 from prompts.primary_assistant import create_primary_assistant_runnable, part_2_tools
 
+# logging
+import logging
+
+# Configure logging
+logging.basicConfig(
+    filename='chatbot.log',
+    level=logging.INFO,
+    format='%(message)s'  # Simple format to match your desired output
+)
 
 #tools
 from tools.utility import create_tool_node_with_fallback
-# from tools.math_tool import add, subtract, multiply
 
+# libs
+from datetime import datetime
 
 def build_graph():
     """
     Build the LangGraph for the customer support chatbot.
     """
     builder = StateGraph(State)
-
+    flushAll()
+    print("deleted the cache")
     # Define nodes
     # def user_info(state: State):
     #     return {"user_info": fetch_user_flight_information.invoke({})}
@@ -63,9 +76,11 @@ def get_response(prompt: str, sender_id: str):
     :param sender_id: Unique identifier for the conversation thread
     :return: Graph response
     """
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_message = f"{current_time}\nUser: {prompt}\n"
+    logging.info(log_message)
     config = {
         "configurable": {
-            "passenger_id": "3442 587242",  # Example passenger ID
             "thread_id": sender_id,
         }
     }
