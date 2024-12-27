@@ -27,6 +27,7 @@ def get_available_slots(startDate, endDate, startTime) -> str:
         endDate (str): The check-out date in YYYY-MM-DD format.
         startTime (str): The time of the tour in HH:MM AM/PM format.
 
+        
     Returns:
         str: A message indicating availability.
     """
