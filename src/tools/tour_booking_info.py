@@ -1,6 +1,6 @@
 # langchain 
 from langchain_core.tools import tool
-
+from langchain_core.runnables import RunnableConfig
 # libs
 from datetime import datetime, date
 import random
@@ -18,7 +18,7 @@ load_dotenv()
 BOOKING_KEY = "abc"
 
 @tool
-def get_available_slots(startDate, endDate, startTime) -> str:
+def get_available_slots(startDate, endDate, startTime,config: RunnableConfig) -> str:
     """
     This tool is used to validate if a given time is within business hours (9 AM–6 PM) on a specified date
 
@@ -230,7 +230,8 @@ def get_current_booking() -> str:
         booking_data = getData(BOOKING_KEY)
         
         if booking_data is None:
-            return "No active booking found. It's a NEW USER"
+            print("no booking found")
+            return "No active booking found.It's a NEW USER use 'get_steps_for_booking_tour' tool "
         print("-----------------------  Booking Data -----------------------")
         print(booking_data)
         print("-----------------------  Booking Data -----------------------")
