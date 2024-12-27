@@ -23,7 +23,7 @@ part_2_tools = [
         
         get_today_date,
         get_available_slots,
-        get_current_booking,
+        # get_current_booking,
         is_date_valid,
         
         get_steps_for_booking_tour,
@@ -50,7 +50,6 @@ def create_primary_assistant_runnable():
                    ## CRITICAL GUIDELINES YOU HAVE TO FOLLOW:
                     You are a helpful customer support assistant for booking a tour.
                     `DO NOT MENTION WHAT YOU ARE GOING TO DO, JUST ASK USER`
-                    before booking check if there customer has already booked , if booked then ask `do you want to reschedule` if not follow steps
                     Don't ask Customer information in one go, ask for it step by step.
                     You always have to follow `get_steps` tool which will provide you a proper steps for booking, rescheduling or canceling a tour.
                     Be clear, concise, and use the tools to provide the required information for each step of the process.
