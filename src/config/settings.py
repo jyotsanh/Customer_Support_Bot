@@ -21,7 +21,7 @@ def get_llm(model:str='google'):
         llm = ChatGoogleGenerativeAI(
                 model="gemini-1.5-flash",
                 api_key=os.getenv("GOOGLE_API_KEY"),
-                temperature=1,
+                temperature=0.4,
                 max_tokens=None,
                 timeout=None,
                 max_retries=2,
@@ -31,8 +31,8 @@ def get_llm(model:str='google'):
     elif model=="openai":
         llm=ChatOpenAI(
                 api_key=os.getenv('OPENAI_API_KEY'),
-                model="gpt-4o-mini", 
-                temperature=0,
+                model="gpt-4o-2024-05-13", 
+                temperature=0.6,
                 stream_usage=True
             )
         
@@ -41,7 +41,7 @@ def get_llm(model:str='google'):
         llm = ChatGroq(
                 model="mixtral-8x7b-32768",
                 api_key=os.getenv("GROQ_API_KEY"),
-                temperature=0,
+                temperature=0.4,
                 max_tokens=None,
                 timeout=None,
                 max_retries=2,
