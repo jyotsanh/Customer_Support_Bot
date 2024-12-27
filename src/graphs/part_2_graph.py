@@ -22,11 +22,16 @@ logging.basicConfig(
     format='%(message)s'  # Simple format to match your desired output
 )
 
-#tools
+# tools
 from tools.utility import create_tool_node_with_fallback
+from tools.tour_booking_info import get_current_booking
 
 # libs
 from datetime import datetime
+
+
+def user_info(state: State):
+    return {"user_info": f"{get_current_booking.invoke({})}"}
 
 def build_graph():
     """
@@ -44,11 +49,13 @@ def build_graph():
 
     # Create assistant and tools nodes
     assistant_runnable = create_primary_assistant_runnable()
+    builder.add_node("user_info", user_info) # -> new line to add user-info
     builder.add_node("assistant", Assistant(assistant_runnable))
     builder.add_node("tools", create_tool_node_with_fallback(part_2_tools))
 
     # Define edges
-    builder.add_edge(START, "assistant")
+    builder.add_edge(START, "user_info")
+    builder.add_edge("user_info","assistant")
     builder.add_conditional_edges(
         "assistant",
         tools_condition,
@@ -61,8 +68,8 @@ def build_graph():
     memory = MemorySaver()
     
     return builder.compile(
-        checkpointer=memory
-        # interrupt_before=["tools"]
+        checkpointer=memory,
+        interrupt_before=["tools"]
     )
 
 # Create the graph
