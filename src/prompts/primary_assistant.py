@@ -23,7 +23,7 @@ part_2_tools = [
         
         get_today_date,
         get_available_slots,
-        # get_current_booking,
+        get_current_booking,
         is_date_valid,
         
         get_steps_for_booking_tour,
