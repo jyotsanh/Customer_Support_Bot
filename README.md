@@ -97,16 +97,10 @@ A conversational AI chatbot that manages hotel room bookings with secure verific
    TAVILY_API_KEY=your_tavily_key
    ```
 
-5. Initialize the database:
-   ```bash
-   python scripts/init_db.py
-   ```
-
-6. Run the application:
+5. Run the application:
    ```bash
    uvicorn src.main:app --reload
    ```
-
 ## Development Status
 
 ⚠️ **Note: This is a development version**
