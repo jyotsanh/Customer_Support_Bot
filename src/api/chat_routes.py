@@ -11,6 +11,18 @@ router = APIRouter(prefix="/chat", tags=["Chat"])
 # class ChatResponse(BaseModel):
 #     message: str
 
+# libs
+from datetime import datetime
+
+# logging
+import logging
+
+# Configure logging
+logging.basicConfig(
+    filename='chatbot.log',
+    level=logging.INFO,
+    format='%(message)s'  # Simple format to match your desired output
+)
 @router.post("/")
 def chat_endpoint(query: str, senderId: str):
     """
@@ -22,6 +34,10 @@ def chat_endpoint(query: str, senderId: str):
     try:
         print("--------Getting response from Runnable LLM node-------")
         response = get_response(query,senderId)
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        log_message = f"{current_time}\nUser: {query}\n"
+        logging.info(log_message)
+        log_message = f"{current_time}\nResponse: {response['messages'][-1].content}\n"
         print()
         print("--------Response from Runnable LLM node received-------")
         print()

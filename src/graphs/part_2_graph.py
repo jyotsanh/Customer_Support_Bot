@@ -80,9 +80,7 @@ def get_response(prompt: str, sender_id: str):
     :param sender_id: Unique identifier for the conversation thread
     :return: Graph response
     """
-    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    log_message = f"{current_time}\nUser: {prompt}\n"
-    logging.info(log_message)
+    
     config = {
         "configurable": {
             "thread_id": sender_id,
