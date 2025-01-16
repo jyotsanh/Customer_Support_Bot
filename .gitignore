@@ -147,6 +147,8 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+src/database/travel2.sqlite
+src/database/travel2.backup.sqlite
 # Pyre type checker
 .pyre/
 

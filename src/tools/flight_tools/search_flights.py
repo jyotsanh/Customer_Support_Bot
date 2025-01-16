@@ -1,4 +1,4 @@
-from src.tools.libs import *
+from tools.libs import *
 
 @tool
 def search_flights(

@@ -10,8 +10,8 @@ import shutil
 import pandas as pd
 # Convert the flights to present time for our tutorial
 
-local_file = "travel2.sqlite"
-backup_file = "travel2.backup.sqlite"
+local_file = "database/travel2.sqlite"
+backup_file = "database/travel2.backup.sqlite"
 
 
 def update_dates(file):
