@@ -18,16 +18,6 @@ from assistants.car_booking_assisstant import *
 from assistants.excursion_booking_assisstant import *
 
 
-# logging
-import logging
-
-# Configure logging
-logging.basicConfig(
-    filename='logs/chatbot.log',
-    level=logging.INFO,
-    format='%(message)s'  # Simple format to match your desired output
-)
-
 # tools
 from tools.utility import create_tool_node_with_fallback
 from tools.tour_booking_info import get_current_booking

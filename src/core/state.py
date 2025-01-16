@@ -51,15 +51,15 @@ class ToBookCarRental(BaseModel):
         description="Any additional information or requests from the user regarding the car rental."
     )
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "location": "Basel",
-                "start_date": "2023-07-01",
-                "end_date": "2023-07-05",
-                "request": "I need a compact car with automatic transmission.",
-            }
-        }
+    # class Config:
+    #     json_schema_extra = {
+    #         "example": {
+    #             "location": "Basel",
+    #             "start_date": "2023-07-01",
+    #             "end_date": "2023-07-05",
+    #             "request": "I need a compact car with automatic transmission.",
+    #         }
+    #     }
 
 
 class ToHotelBookingAssistant(BaseModel):
@@ -74,15 +74,15 @@ class ToHotelBookingAssistant(BaseModel):
         description="Any additional information or requests from the user regarding the hotel booking."
     )
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "location": "Zurich",
-                "checkin_date": "2023-08-15",
-                "checkout_date": "2023-08-20",
-                "request": "I prefer a hotel near the city center with a room that has a view.",
-            }
-        }
+    # class Config:
+    #     json_schema_extra = {
+    #         "example": {
+    #             "location": "Zurich",
+    #             "checkin_date": "2023-08-15",
+    #             "checkout_date": "2023-08-20",
+    #             "request": "I prefer a hotel near the city center with a room that has a view.",
+    #         }
+    #     }
 
 
 class ToBookExcursion(BaseModel):
@@ -95,10 +95,10 @@ class ToBookExcursion(BaseModel):
         description="Any additional information or requests from the user regarding the trip recommendation."
     )
 
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "location": "Lucerne",
-                "request": "The user is interested in outdoor activities and scenic views.",
-            }
-        }
+    # class Config:
+    #     json_schema_extra = {
+    #         "example": {
+    #             "location": "Lucerne",
+    #             "request": "The user is interested in outdoor activities and scenic views.",
+    #         }
+    #     }

@@ -55,6 +55,7 @@ def chat_endpoint(query: str, senderId: str):
         bot_log_message = (
             f"{current_time}\nBot Response: {response['messages'][-1].content}\n"
             f"Time Taken: {response_time:.2f} seconds\n"
+            "----------------------------------------------------------------------------------------------------------------------------"
         )
         logging.info(bot_log_message)
         print()
