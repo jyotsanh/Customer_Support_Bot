@@ -84,3 +84,14 @@ tutorial_questions = [
     "interesting - i like the museums, what options are there? ",
     "OK great pick one and book it for my second day there.",
 ]
+
+
+# def primary(state: State):
+#     question = state["question"]
+#     llm = get_llm(model="google")
+#     generation = llm.invoke([HumanMessage(content=rag_prompt_formatted)])
+#     state = {
+#         **state,
+#         "messages": generation
+#         }
+#     return state

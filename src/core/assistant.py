@@ -14,7 +14,10 @@ class Assistant:
         :param config: Runnable configuration
         :return: Updated state with assistant's response
         """
+        print("-------------------  Assisstant Runnable Response --------------------------")
         while True:
+            
+            
             result = self.runnable.invoke(state)
             
             # Handle empty or invalid responses
@@ -25,9 +28,13 @@ class Assistant:
             ):
                 messages = state["messages"] + [("user", "Respond with a real output.")]
                 state = {**state, "messages": messages}
+                
             else:
                 break
-        
+            
+            
+        print(f"State : {state}")
+        print("-------------------  Assisstant Runnable Response --------------------------")
         return {"messages": result}
     
 class CompleteOrEscalate(BaseModel):
@@ -37,20 +44,20 @@ class CompleteOrEscalate(BaseModel):
     cancel: bool = True
     reason: str
 
-    class Config:
-        json_schema_extra = {
-            "examples": [
-                {
-                    "cancel": True,
-                    "reason": "User changed their mind about the current task.",
-                },
-                {
-                    "cancel": True,
-                    "reason": "I have fully completed the task.",
-                },
-                {
-                    "cancel": False,
-                    "reason": "I need to search the user's emails or calendar for more information.",
-                },
-            ]
-        }
+    # class Config:
+    #     json_schema_extra = {
+    #         "examples": [
+    #             {
+    #                 "cancel": True,
+    #                 "reason": "User changed their mind about the current task.",
+    #             },
+    #             {
+    #                 "cancel": True,
+    #                 "reason": "I have fully completed the task.",
+    #             },
+    #             {
+    #                 "cancel": False,
+    #                 "reason": "I need to search the user's emails or calendar for more information.",
+    #             },
+    #         ]
+    #     }

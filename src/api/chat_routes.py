@@ -38,7 +38,7 @@ def chat_endpoint(query: str, senderId: str):
         # Measure the start time 
         start_time = time.time()
         
-        response = get_response(query,senderId)
+        response = get_response(query, senderId)
         
         # Measure the end time
         end_time = time.time()

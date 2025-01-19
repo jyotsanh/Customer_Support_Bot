@@ -72,8 +72,8 @@ def build_graph():
     builder.add_node("leave_skill", pop_dialog_state)
     builder.add_edge("leave_skill", "primary_assistant")
     
+    
     # Car rental assistant
-
     builder.add_node(
         "enter_book_car_rental",
         create_entry_node("Car Rental Assistant", "book_car_rental"),
@@ -102,9 +102,11 @@ def build_graph():
         ],
     )
     
+    
     # Hotel booking assistant
     builder.add_node(
-        "enter_book_hotel", create_entry_node("Hotel Booking Assistant", "book_hotel")
+        "enter_book_hotel", 
+        create_entry_node("Hotel Booking Assistant", "book_hotel")
     )
     builder.add_node("book_hotel", Assistant(book_hotel_runnable))
     builder.add_edge("enter_book_hotel", "book_hotel")
@@ -161,7 +163,7 @@ def build_graph():
     # directly use a tool, or directly respond to the user
     builder.add_conditional_edges(
         "primary_assistant",
-        route_primary_assistant,
+        route_primary_assistant, # -> Evaluating the state and determining which node to transition to next.
         [
             "enter_update_flight",
             "enter_book_car_rental",
