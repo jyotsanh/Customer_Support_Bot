@@ -13,5 +13,3 @@ langchain-chroma
 langchain-groq
 chromadb
 streamlit
-requests
-something
